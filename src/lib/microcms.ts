@@ -38,6 +38,7 @@ export type Ensemble = {
   caution?: string;
   travelConditions?: string;
   gallery?: MicroCMSImage[];
+  bookingUrl?: string;
   createdAt: string;
   updatedAt: string;
   publishedAt: string;

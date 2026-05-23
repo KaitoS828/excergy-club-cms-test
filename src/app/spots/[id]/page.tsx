@@ -147,7 +147,9 @@ export default async function SpotDetailPage({ params }: PageProps) {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href={`/contact?spot=${encodeURIComponent(spot.title)}`}
+                href={spot.bookingUrl ?? `/contact?spot=${encodeURIComponent(spot.title)}`}
+                target={spot.bookingUrl ? "_blank" : undefined}
+                rel={spot.bookingUrl ? "noopener noreferrer" : undefined}
                 className="inline-flex items-center justify-center px-10 py-3.5 rounded-full text-white text-base font-medium hover:opacity-90 transition-opacity"
                 style={{ backgroundColor: "#3C6B4F" }}
               >
