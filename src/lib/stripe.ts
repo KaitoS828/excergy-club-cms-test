@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+const key = process.env.STRIPE_SECRET_KEY ?? "sk_placeholder_build_only";
+export const stripe = new Stripe(key, {
   apiVersion: "2026-02-25.clover",
 });
 
