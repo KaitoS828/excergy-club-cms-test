@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+:root {
+  --green: #3C6B4F;
+  --green-mid: #5A8D73;
+  --green-pale: #F0F6F2;
+  --bg: #F7FAF7;
+  --text: #1A2B1E;
+  --border: rgba(60,107,79,0.15);
+}
+
+* { box-sizing: border-box; }
+
+html {
+  font-size: 18px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1rem;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: 0.02em;
+  line-height: 1.8;
+}
+
+/* リッチテキスト */
+.prose img { border-radius: 12px; max-width: 100%; height: auto; margin: 1.5rem auto; }
+.prose h2 { font-family: 'Noto Serif JP', serif; font-size: 1.5rem; font-weight: 700; margin-top: 2rem; margin-bottom: 0.75rem; color: var(--green); }
+.prose h3 { font-family: 'Noto Serif JP', serif; font-size: 1.2rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--green); }
+.prose blockquote { border-left: 3px solid var(--green); padding-left: 1rem; color: var(--text); font-style: italic; margin: 1.5rem 0; }
+.prose ul { list-style: disc; padding-left: 1.5rem; }
+.prose ol { list-style: decimal; padding-left: 1.5rem; }
+.prose li { margin: 0.25rem 0; font-size: 1.05rem; }
+.prose p { margin: 0.75rem 0; line-height: 2; font-size: 1.05rem; }
+.prose hr { border-color: var(--border); margin: 2rem 0; }
+
+/* ── イージング変数 ── */
+:root {
+  --ease-out: cubic-bezier(.83, 0, .17, 1);
+  --ease-in-out: cubic-bezier(.76, 0, .24, 1);
+  --duration-fast: 0.45s;
+  --duration-base: 0.65s;
+  --duration-slow: 0.9s;
+}
+
+/* ── アニメーション ── */
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes heroTextIn {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+body > * {
+  animation: pageFadeIn var(--duration-base) var(--ease-out) both;
+}
+
+.page-enter {
+  animation: pageFadeIn var(--duration-base) var(--ease-out) both;
+}
+.card-enter {
+  animation: fadeInUp var(--duration-fast) var(--ease-out) both;
+}
+
+/* ── ヒーローテキスト入場アニメーション ── */
+.hero-label {
+  animation: heroTextIn var(--duration-base) var(--ease-out) 0.2s both;
+}
+.hero-title {
+  animation: heroTextIn var(--duration-slow) var(--ease-out) 0.35s both;
+}
+.hero-caption {
+  animation: heroTextIn var(--duration-base) var(--ease-out) 0.5s both;
+}
+.hero-divider {
+  animation: heroTextIn var(--duration-base) var(--ease-out) 0.6s both;
+}
+.hero-cta {
+  animation: heroTextIn var(--duration-base) var(--ease-out) 0.75s both;
+}
+
+/* ── スクロール連動 Reveal（GSAP ScrollTrigger で制御） ── */
+
+/* ── カードホバー ── */
+.card-lift {
+  transition: transform var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+}
+.card-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 36px rgba(60,107,79,0.12);
+}
+
+/* ── 丸型カード ── */
+.circle-card {
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+.circle-card:hover .circle-img {
+  transform: scale(1.06);
+}
+
+/* ── ニュースルーム横スクロール ── */
+.news-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.news-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── ボタン・リンク共通 ── */
+button, a {
+  transition: opacity var(--duration-fast) var(--ease-out),
+              transform var(--duration-fast) var(--ease-out),
+              background-color var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out);
+}

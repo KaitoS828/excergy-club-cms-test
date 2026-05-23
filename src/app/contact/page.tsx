@@ -1,0 +1,165 @@
+"use client";
+
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+
+const SUBJECTS = [
+  "アンサンブルを主催したい",
+  "拠点を登録・活用したい",
+  "イベントへの参加について",
+  "取材・メディアのご依頼",
+  "その他",
+];
+
+const TYPE_TO_SUBJECT: Record<string, string> = {
+  ensemble: "アンサンブルを主催したい",
+  spot: "拠点を登録・活用したい",
+};
+
+function ContactForm() {
+  const searchParams = useSearchParams();
+  const typeParam = searchParams.get("type") ?? "";
+  const spotParam = searchParams.get("spot") ?? "";
+
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    subject: TYPE_TO_SUBJECT[typeParam] ?? (spotParam ? "拠点を登録・活用したい" : ""),
+    message: spotParam ? `「${spotParam}」について\n\n` : "",
+    privacy: false,
+  });
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  function update(key: string, val: string | boolean) {
+    setForm((prev) => ({ ...prev, [key]: val }));
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          subject: form.subject,
+          message: form.message,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      setSubmitted(true);
+    } catch {
+      setError("送信に失敗しました。もう一度お試しください");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (submitted) {
+    return (
+      <div style={{ backgroundColor: "#FFFFFF" }}>
+        <Header />
+        <main className="pt-[72px] min-h-screen flex items-center justify-center">
+          <div className="text-center px-6">
+            <h1 className="text-3xl font-bold mb-3" style={{ fontFamily: "'Noto Serif JP', serif", color: "#3C6B4F" }}>
+              お問い合わせを受け付けました
+            </h1>
+            <p className="text-base mb-8" style={{ color: "#1A2B1E" }}>
+              内容を確認し、3営業日以内にご連絡いたします。
+            </p>
+            <a href="/" className="text-base" style={{ color: "#1A2B1E" }}>← トップへ戻る</a>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ backgroundColor: "#FFFFFF" }}>
+      <Header />
+      <main className="pt-[72px]">
+        <section className="py-14 md:py-20">
+          <div className="max-w-[600px] mx-auto px-5">
+            <div className="text-center mb-10">
+              <span className="inline-block text-sm font-medium px-4 mb-4" style={{ height: "24px", lineHeight: "24px", borderRadius: "12px", backgroundColor: "#3C6B4F", color: "white" }}>
+                お問い合わせ
+              </span>
+              <h1 className="text-3xl font-bold mb-3" style={{ fontFamily: "'Noto Serif JP', serif", color: "#3C6B4F" }}>
+                お問い合わせ・ご連絡
+              </h1>
+              <p className="text-base" style={{ color: "#1A2B1E" }}>
+                食べられる森アンサンブル倶楽部に関するお問い合わせはこちらから。<br />
+                3営業日以内にご返信いたします。
+              </p>
+            </div>
+
+            {error && (
+              <p className="text-sm text-center mb-4 py-2 px-3 rounded-xl bg-red-50 text-red-600">{error}</p>
+            )}
+
+            <form onSubmit={handleSubmit} className="bg-white rounded-3xl p-8 space-y-4" style={{ border: "1px solid rgba(0,95,2,0.15)" }}>
+              <Field label="お名前">
+                <input value={form.name} onChange={(e) => update("name", e.target.value)} required placeholder="山田 太郎" className={ic} />
+              </Field>
+              <Field label="メールアドレス">
+                <input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} required placeholder="your@email.com" className={ic} />
+              </Field>
+              <Field label="ご用件">
+                <select value={form.subject} onChange={(e) => update("subject", e.target.value)} required className={ic}>
+                  <option value="">選択してください</option>
+                  {SUBJECTS.map((s) => <option key={s}>{s}</option>)}
+                </select>
+              </Field>
+              <Field label="メッセージ">
+                <textarea value={form.message} onChange={(e) => update("message", e.target.value)} required rows={5} placeholder="お問い合わせ内容をご記入ください" className={ic} />
+              </Field>
+
+              {/* プライバシーポリシー */}
+              <div className="pt-2 pb-1">
+                <div className="text-sm p-4 rounded-xl mb-3" style={{ backgroundColor: "#FFFFFF", color: "#1A2B1E" }}>
+                  <p className="font-medium mb-1" style={{ color: "#3C6B4F" }}>プライバシーポリシー</p>
+                  <p>ご入力いただいた個人情報は、お問い合わせへの返答のみに使用し、第三者への提供は行いません。</p>
+                </div>
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" checked={form.privacy} onChange={(e) => update("privacy", e.target.checked)} required className="mt-0.5 accent-green-700" />
+                  <span className="text-base" style={{ color: "#3C6B4F" }}>プライバシーポリシーに同意します</span>
+                </label>
+              </div>
+
+              <button type="submit" disabled={loading || !form.privacy} className="w-full py-3.5 rounded-full text-base font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50" style={{ backgroundColor: "#3C6B4F" }}>
+                {loading ? "送信中..." : "送信する"}
+              </button>
+            </form>
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="block text-sm font-medium mb-1.5" style={{ color: "#777777" }}>{label}</label>
+      {children}
+    </div>
+  );
+}
+const ic = "w-full px-4 py-2.5 rounded-2xl text-base outline-none bg-gray-50 border border-transparent focus:border-green-700 transition-colors";
+
+export default function ContactPage() {
+  return (
+    <Suspense fallback={null}>
+      <ContactForm />
+    </Suspense>
+  );
+}

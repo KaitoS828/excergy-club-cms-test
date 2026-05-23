@@ -1,0 +1,188 @@
+import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { getReport } from "@/lib/microcms";
+
+export const revalidate = 60;
+
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+async function isLoggedIn(): Promise<boolean> {
+  try {
+    const cookieStore = await cookies();
+    const session = cookieStore.get("fb_session")?.value;
+    if (!session) return false;
+    const { adminAuth } = await import("@/lib/firebase-admin");
+    await adminAuth.verifySessionCookie(session, true);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const CATEGORY_COLORS: Record<string, string> = {
+  "北海道・十勝":      "#4A7C59",
+  "静岡・御前崎":      "#C4712E",
+  "兵庫・竹野":        "#8FB996",
+  "高知・四万十":      "#C4A832",
+  "東京・武蔵野":      "#5C6B55",
+  "アンサンブル":      "#4A7C59",
+  "AI・テクノロジー":  "#7BA3C4",
+  "生活生産":          "#A47C5C",
+};
+
+export default async function ReportDetailPage({ params }: PageProps) {
+  const { id } = await params;
+
+  let report;
+  try {
+    report = await getReport(id);
+  } catch {
+    notFound();
+  }
+
+  const loggedIn = await isLoggedIn();
+  const color = report.category ? (CATEGORY_COLORS[report.category] ?? "#4A7C59") : "#4A7C59";
+
+  return (
+    <div style={{ backgroundColor: "#FFFFFF" }}>
+      <Header />
+      <main className="pt-[72px]">
+
+        {/* ── Hero ── */}
+        <section className="py-12 md:py-20" style={{ backgroundColor: "#FFFFFF" }}>
+          <div className="max-w-[800px] mx-auto px-5 lg:px-10">
+            <a
+              href="/reports"
+              className="inline-flex items-center gap-1.5 text-sm mb-8 transition-opacity hover:opacity-70"
+              style={{ color: "#1A2B1E" }}
+            >
+              ← 活動レポート一覧
+            </a>
+
+            {report.category && (
+              <div className="mb-5">
+                <span
+                  className="text-sm px-3 py-1 rounded-full font-medium"
+                  style={{ backgroundColor: color + "20", color }}
+                >
+                  {report.category}
+                </span>
+              </div>
+            )}
+
+            <p className="text-base mb-4" style={{ color: "#1A2B1E", opacity: 0.5 }}>{report.date}</p>
+
+            <h1
+              className="text-3xl md:text-4xl font-bold leading-snug mb-8"
+              style={{ fontFamily: "'Noto Serif JP', serif", color: "#3C6B4F" }}
+            >
+              {report.title}
+            </h1>
+
+            {report.image && (
+              <div className="rounded-2xl overflow-hidden mb-10" style={{ height: "320px" }}>
+                <img src={report.image.url} alt={report.title} className="w-full h-full object-cover" />
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* ── 本文 or ログインゲート ── */}
+        {loggedIn ? (
+          <section className="pb-16" style={{ backgroundColor: "#FFFFFF" }}>
+            <div className="max-w-[800px] mx-auto px-5 lg:px-10">
+              {report.body ? (
+                <div
+                  className="prose prose-sm md:prose-base max-w-none"
+                  style={{ color: "#1A2B1E" }}
+                  dangerouslySetInnerHTML={{ __html: report.body }}
+                />
+              ) : (
+                <p className="text-base leading-relaxed" style={{ color: "#1A2B1E" }}>
+                  {report.title}
+                </p>
+              )}
+            </div>
+          </section>
+        ) : (
+          <section className="pb-20" style={{ backgroundColor: "#FFFFFF" }}>
+            <div className="max-w-[800px] mx-auto px-5 lg:px-10">
+
+              {report.body && (
+                <div className="relative">
+                  <div
+                    className="prose prose-sm md:prose-base max-w-none"
+                    style={{ color: "#1A2B1E", maxHeight: "200px", overflow: "hidden" }}
+                    dangerouslySetInnerHTML={{ __html: report.body }}
+                  />
+                  <div
+                    className="absolute bottom-0 left-0 right-0 h-24"
+                    style={{ background: "linear-gradient(to bottom, transparent, white)" }}
+                  />
+                </div>
+              )}
+
+              <div
+                className="mt-8 rounded-3xl px-8 py-10 text-center"
+                style={{ backgroundColor: "rgba(0,95,2,0.04)", border: "1.5px solid rgba(0,95,2,0.12)" }}
+              >
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
+                  style={{ backgroundColor: "#3C6B4F" }}
+                >
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                </div>
+                <h2
+                  className="text-xl font-bold mb-2"
+                  style={{ fontFamily: "'Noto Serif JP', serif", color: "#3C6B4F" }}
+                >
+                  全文を読むにはログインが必要です
+                </h2>
+                <p className="text-base mb-6" style={{ color: "#1A2B1E" }}>
+                  活動レポートの全文は、食べられる森アンサンブル倶楽部の会員のみご覧いただけます。
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <a
+                    href={`/login?callbackUrl=/reports/${report.id}`}
+                    className="px-8 py-3 rounded-full text-base font-medium text-white transition-opacity hover:opacity-90"
+                    style={{ backgroundColor: "#3C6B4F" }}
+                  >
+                    ログインして読む
+                  </a>
+                  <a
+                    href="/join"
+                    className="px-8 py-3 rounded-full text-base font-medium border transition-opacity hover:opacity-70"
+                    style={{ borderColor: "rgba(0,95,2,0.2)", color: "#3C6B4F" }}
+                  >
+                    会員登録する
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        <section className="pb-16" style={{ backgroundColor: "#FFFFFF" }}>
+          <div className="max-w-[800px] mx-auto px-5 lg:px-10 text-center">
+            <a
+              href="/reports"
+              className="inline-flex items-center gap-2 text-base font-medium transition-opacity hover:opacity-70"
+              style={{ color: "#3C6B4F" }}
+            >
+              ← 活動レポート一覧に戻る
+            </a>
+          </div>
+        </section>
+
+      </main>
+      <Footer />
+    </div>
+  );
+}
