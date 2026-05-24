@@ -91,28 +91,26 @@ function NewsroomSection({ reports = [] }: { reports?: Report[] }) {
         ) : (
           <div className="flex gap-5 md:gap-6 overflow-x-auto pb-2 -mx-6 px-6 lg:mx-0 lg:px-0">
             {items.map((item, i) => (
-              <RevealOnScroll key={item.id} delay={i * 60}>
-                <a href={`/reports/${item.id}`} className="shrink-0 group block" style={{ width: "min(240px, 70vw)" }}>
-                  <div className="relative rounded-2xl overflow-hidden mb-4 aspect-[4/3] bg-[#f0f0f0]">
-                    {item.image ? (
-                      <img src={item.image.url} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-3xl" style={{ backgroundColor: "rgba(60,107,79,0.08)" }}>🌳</div>
-                    )}
-                    {i === 0 && (
-                      <span className="absolute top-2 left-2 text-xs font-medium px-2 py-0.5" style={{ backgroundColor: "#3C6B4F", color: "white", borderRadius: "3px" }}>
-                        最新
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm mb-2 tracking-wide" style={{ color: "#1A2B1E", opacity: 0.45, fontFamily: "'Noto Serif JP', serif" }}>
-                    {item.date}{item.category ? `　${item.category}` : ""}
-                  </p>
-                  <p className="text-base font-bold leading-snug group-hover:text-[#3C6B4F] transition-colors" style={{ fontFamily: "'Noto Serif JP', serif", color: "#1A2B1E" }}>
-                    {item.title}
-                  </p>
-                </a>
-              </RevealOnScroll>
+              <a key={item.id} href={`/reports/${item.id}`} className="shrink-0 group block" style={{ width: "min(240px, 70vw)" }}>
+                <div className="relative rounded-2xl overflow-hidden mb-4 aspect-[4/3] bg-[#f0f0f0]">
+                  {item.image ? (
+                    <img src={item.image.url} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-3xl" style={{ backgroundColor: "rgba(60,107,79,0.08)" }}>🌳</div>
+                  )}
+                  {i === 0 && (
+                    <span className="absolute top-2 left-2 text-xs font-medium px-2 py-0.5" style={{ backgroundColor: "#3C6B4F", color: "white", borderRadius: "3px" }}>
+                      最新
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm mb-2 tracking-wide" style={{ color: "#1A2B1E", opacity: 0.45, fontFamily: "'Noto Serif JP', serif" }}>
+                  {item.date}{item.category ? `　${item.category}` : ""}
+                </p>
+                <p className="text-base font-bold leading-snug group-hover:text-[#3C6B4F] transition-colors" style={{ fontFamily: "'Noto Serif JP', serif", color: "#1A2B1E" }}>
+                  {item.title}
+                </p>
+              </a>
             ))}
           </div>
         )}
