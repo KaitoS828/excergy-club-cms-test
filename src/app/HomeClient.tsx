@@ -68,7 +68,8 @@ function HeroSection({ slides = SLIDES_DEFAULT }: { slides?: SlideView[] }) {
 // 活動レポート（CMS連動）
 // ─────────────────────────────────────────
 function NewsroomSection({ reports = [] }: { reports?: Report[] }) {
-  const items = reports.slice(0, 6);
+  const latest = reports[0];
+  const rest = reports.slice(1, 6);
 
   return (
     <section className="bg-white py-14 md:py-20 border-b" style={{ borderColor: "rgba(0,0,0,0.06)" }}>
@@ -86,30 +87,59 @@ function NewsroomSection({ reports = [] }: { reports?: Report[] }) {
           </div>
         </RevealOnScroll>
 
-        {items.length > 0 ? (
-          <div className="flex gap-5 md:gap-6 overflow-x-auto pb-2 -mx-6 px-6 lg:mx-0 lg:px-0">
-            {items.map((item, i) => (
-              <RevealOnScroll key={item.id} delay={i * 60}>
-                <a href={`/reports/${item.id}`} className="shrink-0 group block" style={{ width: "min(260px, 72vw)" }}>
-                  <div className="rounded-2xl overflow-hidden mb-4 aspect-[4/3] bg-[#f0f0f0]">
-                    {item.image ? (
-                      <img src={item.image.url} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-3xl" style={{ backgroundColor: "rgba(60,107,79,0.08)" }}>🌳</div>
-                    )}
-                  </div>
-                  <p className="text-sm mb-2 tracking-wide" style={{ color: "#1A2B1E", opacity: 0.45, fontFamily: "'Noto Serif JP', serif" }}>
-                    {item.date}{item.category ? `　${item.category}` : ""}
-                  </p>
-                  <p className="text-base font-bold leading-snug group-hover:text-[#3C6B4F] transition-colors" style={{ fontFamily: "'Noto Serif JP', serif", color: "#1A2B1E" }}>
-                    {item.title}
-                  </p>
-                </a>
-              </RevealOnScroll>
-            ))}
-          </div>
-        ) : (
+        {!latest ? (
           <p className="text-base text-center py-12" style={{ color: "#1A2B1E", opacity: 0.4 }}>レポートはまだありません</p>
+        ) : (
+          <div className="flex flex-col gap-8">
+            {/* 最新レポート：大きく表示 */}
+            <RevealOnScroll>
+              <a href={`/reports/${latest.id}`} className="group block md:flex gap-8 rounded-3xl overflow-hidden border hover:shadow-lg transition-shadow" style={{ borderColor: "rgba(0,0,0,0.07)" }}>
+                <div className="shrink-0 md:w-[480px] aspect-[16/9] md:aspect-auto md:h-[320px] overflow-hidden bg-[#f0f0f0]">
+                  {latest.image ? (
+                    <img src={latest.image.url} alt={latest.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-5xl" style={{ backgroundColor: "rgba(60,107,79,0.08)" }}>🌳</div>
+                  )}
+                </div>
+                <div className="flex flex-col justify-center p-6 md:p-8">
+                  <span className="inline-block text-xs font-medium px-2 py-0.5 mb-3 self-start" style={{ backgroundColor: "#3C6B4F", color: "white", borderRadius: "3px" }}>
+                    最新
+                  </span>
+                  <p className="text-sm mb-3" style={{ color: "#1A2B1E", opacity: 0.45, fontFamily: "'Noto Serif JP', serif" }}>
+                    {latest.date}{latest.category ? `　${latest.category}` : ""}
+                  </p>
+                  <p className="text-xl md:text-2xl font-bold leading-snug group-hover:text-[#3C6B4F] transition-colors" style={{ fontFamily: "'Noto Serif JP', serif", color: "#1A2B1E" }}>
+                    {latest.title}
+                  </p>
+                </div>
+              </a>
+            </RevealOnScroll>
+
+            {/* 過去レポート：横スクロール */}
+            {rest.length > 0 && (
+              <div className="flex gap-5 md:gap-6 overflow-x-auto pb-2 -mx-6 px-6 lg:mx-0 lg:px-0">
+                {rest.map((item, i) => (
+                  <RevealOnScroll key={item.id} delay={i * 60}>
+                    <a href={`/reports/${item.id}`} className="shrink-0 group block" style={{ width: "min(240px, 70vw)" }}>
+                      <div className="rounded-2xl overflow-hidden mb-4 aspect-[4/3] bg-[#f0f0f0]">
+                        {item.image ? (
+                          <img src={item.image.url} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-3xl" style={{ backgroundColor: "rgba(60,107,79,0.08)" }}>🌳</div>
+                        )}
+                      </div>
+                      <p className="text-sm mb-2 tracking-wide" style={{ color: "#1A2B1E", opacity: 0.45, fontFamily: "'Noto Serif JP', serif" }}>
+                        {item.date}{item.category ? `　${item.category}` : ""}
+                      </p>
+                      <p className="text-base font-bold leading-snug group-hover:text-[#3C6B4F] transition-colors" style={{ fontFamily: "'Noto Serif JP', serif", color: "#1A2B1E" }}>
+                        {item.title}
+                      </p>
+                    </a>
+                  </RevealOnScroll>
+                ))}
+              </div>
+            )}
+          </div>
         )}
       </div>
     </section>
