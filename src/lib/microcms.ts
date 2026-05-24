@@ -47,7 +47,7 @@ export type Ensemble = {
 export async function getEnsembles(): Promise<Ensemble[]> {
   const res = await client.getList<Ensemble>({
     endpoint: "ensembles",
-    queries: { limit: 50 },
+    queries: { limit: 50, orders: "publishedAt" },
   });
   return res.contents;
 }

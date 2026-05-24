@@ -395,7 +395,7 @@ function SearchSection({ ensembles = [], spots = [] }: { ensembles?: Ensemble[];
 // 各地の食べられる森（CMS連動）
 // ─────────────────────────────────────────
 function EnsembleListSection({ ensembles = [] }: { ensembles?: Ensemble[] }) {
-  const displayed = ensembles.slice(0, 8);
+  const displayed = ensembles;
 
   return (
     <section id="events" className="py-16 md:py-24 bg-white">
